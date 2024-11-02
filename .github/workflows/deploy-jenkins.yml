@@ -116,20 +116,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-          
+
+      - name: Decode SSH key
+        run: |
+          echo "${{ secrets.K3S_MASTER_SSH_KEY }}" | base64 --decode > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+        shell: bash
+
       - name: Show k3s master IP
         run: |
           echo "Using K3S_MASTER_IP: ${{ env.K3S_MASTER_IP }}"
 
-      - name: Add Jenkins Helm repo
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ env.K3S_MASTER_IP }}
-          username: ec2-user
-          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
-          script: |
-            helm repo add jenkins https://charts.jenkins.io
-            helm repo update
+          - name: Add Jenkins Helm repo
+          uses: appleboy/ssh-action@v0.1.3
+          with:
+            host: ${{ env.K3S_MASTER_IP }}
+            username: ec2-user
+            key_path: ~/.ssh/id_rsa
+            script: |
+              helm repo add jenkins https://charts.jenkins.io
+              helm repo update
 
       - name: Create Jenkins namespace
         uses: appleboy/ssh-action@v0.1.3
