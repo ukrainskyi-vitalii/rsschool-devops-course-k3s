@@ -113,6 +113,7 @@ jobs:
 
       - name: Decode SSH key
         run: |
+          mkdir -p ~/.ssh
           echo "${{ secrets.K3S_MASTER_SSH_KEY }}" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
         shell: bash
