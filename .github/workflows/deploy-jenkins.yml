@@ -126,6 +126,9 @@ jobs:
               # Install k3s
               curl -sfL https://get.k3s.io | sh -
 
+              # Change permissions to allow access to k3s config
+              sudo chmod 644 /etc/rancher/k3s/k3s.yaml
+
               # Set up kubectl to use k3s config
               export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
 
@@ -147,8 +150,8 @@ jobs:
               /usr/local/bin/helm repo update &&
                 
               # Create Jenkins namespace
-              /usr/local/bin/kubectl create namespace jenkins &&
-              /usr/local/bin/kubectl get namespaces &&
+              sudo /usr/local/bin/kubectl create namespace jenkins &&
+              sudo /usr/local/bin/kubectl get namespaces &&
 
               # Step 3: Create Jenkins volume directory and set permissions
               sudo mkdir -p /data/jenkins-volume &&
@@ -156,10 +159,10 @@ jobs:
               ls -ld /data/jenkins-volume &&
 
               # Step 4: Apply persistent volume configuration
-              /usr/local/bin/kubectl apply -f jenkins-volume.yaml &&
+              sudo /usr/local/bin/kubectl apply -f jenkins-volume.yaml &&
 
               # Step 5: Apply service account configuration
-              /usr/local/bin/kubectl apply -f jenkins-sa.yaml &&
+              sudo /usr/local/bin/kubectl apply -f jenkins-sa.yaml &&
 
               # Step 6: Install Jenkins using Helm
               /usr/local/bin/helm install jenkins -n jenkins -f jenkins-values.yaml jenkins/jenkins
