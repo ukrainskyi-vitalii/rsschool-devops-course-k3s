@@ -9,8 +9,8 @@ resource "aws_instance" "k3s_master" {
     curl -sfL https://get.k3s.io | sh -
 
     # Install Helm
-    wget https://get.helm.sh/helm-v3.9.0-linux-amd64.tar.gz
-    tar -zxvf helm-v3.9.0-linux-amd64.tar.gz
+    wget https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz
+    tar -zxvf helm-v3.16.2-linux-amd64.tar.gz
     mv linux-amd64/helm /usr/local/bin/helm
   EOF
 
@@ -21,4 +21,9 @@ resource "aws_instance" "k3s_master" {
 
 output "master_private_ip" {
   value = aws_instance.k3s_master.private_ip
+}
+
+output "k3s_master_ip" {
+  value       = aws_instance.k3s_master.public_ip
+  description = "Public IP of the k3s master instance"
 }
