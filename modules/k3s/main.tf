@@ -4,19 +4,6 @@ resource "aws_instance" "k3s_master" {
   subnet_id       = var.public_subnet_id
   key_name        = var.ssh_key_name
   security_groups = [aws_security_group.k3s_sg.id]
-  user_data = <<-EOF
-    #!/bin/bash
-    curl -sfL https://get.k3s.io | sh -
-
-    # Install Helm
-    wget https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz
-    tar -zxvf helm-v3.16.2-linux-amd64.tar.gz
-    mv linux-amd64/helm /usr/local/bin/helm
-
-    # Install kubectl
-    curl -o /usr/local/bin/kubectl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-    chmod +x /usr/local/bin/kubectl
-  EOF
 
   tags = {
     Name = "k3s-master"

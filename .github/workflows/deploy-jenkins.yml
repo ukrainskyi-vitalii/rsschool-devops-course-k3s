@@ -123,6 +123,12 @@ jobs:
       - name: Deploy Jenkins
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} "
+              # Install k3s
+              curl -sfL https://get.k3s.io | sh -
+
+              # Set up kubectl to use k3s config
+              export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
               # Install Helm
               curl -L https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz -o helm.tar.gz &&
               tar -zxvf helm.tar.gz &&
