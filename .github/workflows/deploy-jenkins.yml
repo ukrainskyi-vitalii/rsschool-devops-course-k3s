@@ -126,11 +126,11 @@ jobs:
         
       - name: Copy Jenkins Service Account Configuration
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key helm-configs/jenkins-sa.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}/jenkins-sa.yaml
+          scp -o StrictHostKeyChecking=no -i private_key helm-configs/jenkins-sa.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}:/home/${{ env.USER_NAME }}/jenkins-sa.yaml
         
       - name: Copy Jenkins Values Configuration
         run: |
-          scp -o StrictHostKeyChecking=no -i private_key helm-configs/jenkins-values.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}/jenkins-values.yaml
+          scp -o StrictHostKeyChecking=no -i private_key helm-configs/jenkins-values.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}:/home/${{ env.USER_NAME }}/jenkins-values.yaml
 
       - name: Deploy Jenkins
         run: |
