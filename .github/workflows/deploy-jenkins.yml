@@ -111,12 +111,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Decode SSH key
+      - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.K3S_MASTER_SSH_KEY }}" | base64 --decode > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
         shell: bash
+
+      - name: Verify SSH Key
+        run: ls -l ~/.ssh/id_rsa
 
       - name: Show k3s master IP
         run: |
@@ -137,7 +140,7 @@ jobs:
         with:
           host: ${{ env.K3S_MASTER_IP }}
           username: ec2-user
-          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          key_path: ~/.ssh/id_rsa
           script: |
             kubectl create namespace jenkins || true
 
@@ -146,7 +149,7 @@ jobs:
         with:
           host: ${{ env.K3S_MASTER_IP }}
           username: ec2-user
-          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          key_path: ~/.ssh/id_rsa
           script: |
             sudo mkdir -p /data/jenkins-volume/
             sudo chmod 777 /data/jenkins-volume/
@@ -156,7 +159,7 @@ jobs:
         with:
           host: ${{ env.K3S_MASTER_IP }}
           username: ec2-user
-          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          key_path: ~/.ssh/id_rsa
           script: |
             kubectl apply -f helm-configs/jenkins-volume.yaml
 
@@ -165,7 +168,7 @@ jobs:
         with:
           host: ${{ env.K3S_MASTER_IP }}
           username: ec2-user
-          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          key_path: ~/.ssh/id_rsa
           script: |
             kubectl apply -f helm-configs/jenkins-sa.yaml
 
@@ -174,7 +177,7 @@ jobs:
         with:
           host: ${{ env.K3S_MASTER_IP }}
           username: ec2-user
-          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          key_path: ~/.ssh/id_rsa
           script: |
             helm upgrade --install jenkins jenkins/jenkins -n jenkins -f helm-configs/jenkins-values.yaml
 
@@ -183,7 +186,7 @@ jobs:
         with:
           host: ${{ env.K3S_MASTER_IP }}
           username: ec2-user
-          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          key_path: ~/.ssh/id_rsa
           script: |
             echo "Checking Jenkins deployment status..."
             kubectl rollout status deployment/jenkins -n jenkins
