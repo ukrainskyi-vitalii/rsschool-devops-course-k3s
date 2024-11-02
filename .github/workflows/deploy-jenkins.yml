@@ -124,26 +124,26 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} "
               # Add Jenkins Helm repository
-              helm repo add jenkins https://charts.jenkins.io &&
-              helm repo update &&
+              /usr/local/bin/helm repo add jenkins https://charts.jenkins.io &&
+              /usr/local/bin/helm repo update &&
                 
               # Create Jenkins namespace
-              kubectl create namespace jenkins
-              kubectl get namespaces
+              /usr/local/bin/kubectl create namespace jenkins &&
+              /usr/local/bin/kubectl get namespaces &&
 
               # Step 3: Create Jenkins volume directory and set permissions
-              sudo mkdir -p /data/jenkins-volume
-              sudo chmod 777 /data/jenkins-volume
-              ls -ld /data/jenkins-volume
+              sudo mkdir -p /data/jenkins-volume &&
+              sudo chmod 777 /data/jenkins-volume &&
+              ls -ld /data/jenkins-volume &&
 
               # Step 4: Apply persistent volume configuration
-              kubectl apply -f jenkins-volume.yaml
+              /usr/local/bin/kubectl apply -f jenkins-volume.yaml &&
 
               # Step 5: Apply service account configuration
-              kubectl apply -f jenkins-sa.yaml
+              /usr/local/bin/kubectl apply -f jenkins-sa.yaml &&
 
               # Step 6: Install Jenkins using Helm
-              helm install jenkins -n jenkins -f jenkins-values.yaml jenkins/jenkins
+              /usr/local/bin/helm install jenkins -n jenkins -f jenkins-values.yaml jenkins/jenkins
           "
 
       - name: Cleanup SSH Key
