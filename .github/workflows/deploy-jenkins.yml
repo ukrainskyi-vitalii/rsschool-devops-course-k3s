@@ -92,9 +92,15 @@ jobs:
       - name: Get k3s master IP
         id: get_ip
         run: |
+          echo "Retrieving k3s master IP..."
           K3S_MASTER_IP=$(terraform output -raw k3s_master_ip 2>/dev/null || echo "NOT_FOUND")
           echo "K3S_MASTER_IP=$K3S_MASTER_IP" >> $GITHUB_ENV
-      
+      - name: Check if K3S_MASTER_IP is set
+        run: |
+          echo "K3S_MASTER_IP from GITHUB_ENV is: $K3S_MASTER_IP"
+        env:
+          K3S_MASTER_IP: ${{ env.K3S_MASTER_IP }}
+    
   deploy-jenkins:
     name: Deploy Jenkins
     runs-on: ubuntu-latest
