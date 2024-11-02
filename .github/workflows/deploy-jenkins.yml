@@ -109,7 +109,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
+      - name: Check if K3S_MASTER_IP is set
+        run: |
+          echo "K3S_MASTER_IP from GITHUB_ENV is: $K3S_MASTER_IP"
+        env:
+          K3S_MASTER_IP: ${{ env.K3S_MASTER_IP }}
+          
       - name: Show k3s master IP
         run: |
           echo "Using K3S_MASTER_IP: ${{ env.K3S_MASTER_IP }}"
