@@ -109,24 +109,26 @@ jobs:
       USER_NAME: ${{ vars.USER_NAME }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
+    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+  
       - name: Setup SSH Key
         run: |
           echo "${{ env.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
-
+  
       - name: Deploy Jenkins
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} "
               # Додайте Jenkins Helm репозиторій та оновіть його
               helm repo add jenkins https://charts.jenkins.io &&
               helm repo update &&
-
-              # Створіть namespace для Jenkins"
-              kubectl create namespace jenkins &&
+                
+              # Створіть namespace для Jenkins
+              kubectl create namespace jenkins
           "
 
       - name: Cleanup SSH Key
