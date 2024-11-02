@@ -144,18 +144,6 @@ jobs:
 
               # Step 6: Install Jenkins using Helm
               helm install jenkins -n jenkins -f jenkins-values.yaml jenkins/jenkins
-
-              # Step 7: Verify Jenkins pod and service status
-              kubectl get pods -n jenkins
-              kubectl get svc -n jenkins
-
-              # Step 8: Retrieve admin password
-              jsonpath="{.data.jenkins-admin-password}"
-              secret=$(kubectl get secret -n jenkins jenkins -o jsonpath=$jsonpath)
-              echo "Jenkins admin password: $(echo $secret | base64 --decode)"
-
-              # Step 9: Retrieve Jenkins logs
-              kubectl logs jenkins-0 -n jenkins
           "
 
       - name: Cleanup SSH Key

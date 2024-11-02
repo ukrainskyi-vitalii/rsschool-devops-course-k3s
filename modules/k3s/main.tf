@@ -12,6 +12,10 @@ resource "aws_instance" "k3s_master" {
     wget https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz
     tar -zxvf helm-v3.16.2-linux-amd64.tar.gz
     mv linux-amd64/helm /usr/local/bin/helm
+
+    # Install kubectl
+    curl -o /usr/local/bin/kubectl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+    chmod +x /usr/local/bin/kubectl
   EOF
 
   tags = {
