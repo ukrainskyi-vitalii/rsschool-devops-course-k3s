@@ -104,34 +104,73 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: SSH to k3s_master and deploy Jenkins
+      - name: Show k3s master IP
+        run: |
+          echo "Using K3S_MASTER_IP: ${{ env.K3S_MASTER_IP }}"
+
+      - name: Add Jenkins Helm repo
         uses: appleboy/ssh-action@v0.1.3
         with:
           host: ${{ env.K3S_MASTER_IP }}
           username: ec2-user
           key: ${{ secrets.K3S_MASTER_SSH_KEY }}
           script: |
-            # 1. Add Jenkins Helm repo and update
             helm repo add jenkins https://charts.jenkins.io
             helm repo update
 
-            # 2. Create the Jenkins namespace
+      - name: Create Jenkins namespace
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ env.K3S_MASTER_IP }}
+          username: ec2-user
+          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          script: |
             kubectl create namespace jenkins || true
 
-            # 3. Create persistent volume directory and set permissions
+      - name: Create persistent volume directory
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ env.K3S_MASTER_IP }}
+          username: ec2-user
+          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          script: |
             sudo mkdir -p /data/jenkins-volume/
             sudo chmod 777 /data/jenkins-volume/
 
-            # 4. Apply the persistent volume configuration from GitHub Variable
+      - name: Apply persistent volume configuration
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ env.K3S_MASTER_IP }}
+          username: ec2-user
+          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          script: |
             kubectl apply -f helm-configs/jenkins-volume.yaml
 
-            # 5. Apply the service account configuration from GitHub Variable
+      - name: Apply service account configuration
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ env.K3S_MASTER_IP }}
+          username: ec2-user
+          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          script: |
             kubectl apply -f helm-configs/jenkins-sa.yaml
 
-            # 6. Install Jenkins using Helm with values from GitHub Variable
+      - name: Install Jenkins using Helm
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ env.K3S_MASTER_IP }}
+          username: ec2-user
+          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          script: |
             helm upgrade --install jenkins jenkins/jenkins -n jenkins -f helm-configs/jenkins-values.yaml
 
-            # 7. Verify Jenkins deployment status
+      - name: Verify Jenkins deployment status
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          host: ${{ env.K3S_MASTER_IP }}
+          username: ec2-user
+          key: ${{ secrets.K3S_MASTER_SSH_KEY }}
+          script: |
             echo "Checking Jenkins deployment status..."
             kubectl rollout status deployment/jenkins -n jenkins
             kubectl get pods -n jenkins
