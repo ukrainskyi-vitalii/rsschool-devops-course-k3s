@@ -105,7 +105,9 @@ jobs:
     needs: terraform-apply
 
     env:
-      K3S_MASTER_IP: ${{ needs.terraform-apply.outputs.k3s_master_ip }}
+      HOSTNAME: ${{ needs.terraform-apply.outputs.k3s_master_ip }}
+      USER_NAME: ${{ vars.USER_NAME }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
 
     steps:
       - name: Checkout code
@@ -113,84 +115,22 @@ jobs:
 
       - name: Setup SSH Key
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.K3S_MASTER_SSH_KEY }}" | base64 --decode > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-        shell: bash
+          echo "${{ env.SSH_PRIVATE_KEY }}" > private_key
+          chmod 600 private_key
 
-      - name: Verify SSH Key
-        run: ls -l ~/.ssh/id_rsa
-
-      - name: Show k3s master IP
+      - name: Deploy Jenkins
         run: |
-          echo "Using K3S_MASTER_IP: ${{ env.K3S_MASTER_IP }}"
+          ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} "
+              # Додайте Jenkins Helm репозиторій та оновіть його
+              helm repo add jenkins https://charts.jenkins.io &&
+              helm repo update &&
 
-      - name: Add Jenkins Helm repo
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ env.K3S_MASTER_IP }}
-          username: ec2-user
-          key_path: ~/.ssh/id_rsa
-          script: |
-            helm repo add jenkins https://charts.jenkins.io
-            helm repo update
+              # Створіть namespace для Jenkins"
+              kubectl create namespace jenkins &&
+          "
 
-      - name: Create Jenkins namespace
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ env.K3S_MASTER_IP }}
-          username: ec2-user
-          key_path: ~/.ssh/id_rsa
-          script: |
-            kubectl create namespace jenkins || true
-
-      - name: Create persistent volume directory
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ env.K3S_MASTER_IP }}
-          username: ec2-user
-          key_path: ~/.ssh/id_rsa
-          script: |
-            sudo mkdir -p /data/jenkins-volume/
-            sudo chmod 777 /data/jenkins-volume/
-
-      - name: Apply persistent volume configuration
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ env.K3S_MASTER_IP }}
-          username: ec2-user
-          key_path: ~/.ssh/id_rsa
-          script: |
-            kubectl apply -f helm-configs/jenkins-volume.yaml
-
-      - name: Apply service account configuration
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ env.K3S_MASTER_IP }}
-          username: ec2-user
-          key_path: ~/.ssh/id_rsa
-          script: |
-            kubectl apply -f helm-configs/jenkins-sa.yaml
-
-      - name: Install Jenkins using Helm
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ env.K3S_MASTER_IP }}
-          username: ec2-user
-          key_path: ~/.ssh/id_rsa
-          script: |
-            helm upgrade --install jenkins jenkins/jenkins -n jenkins -f helm-configs/jenkins-values.yaml
-
-      - name: Verify Jenkins deployment status
-        uses: appleboy/ssh-action@v0.1.3
-        with:
-          host: ${{ env.K3S_MASTER_IP }}
-          username: ec2-user
-          key_path: ~/.ssh/id_rsa
-          script: |
-            echo "Checking Jenkins deployment status..."
-            kubectl rollout status deployment/jenkins -n jenkins
-            kubectl get pods -n jenkins
+      - name: Cleanup SSH Key
+        run: rm -f private_key
 
   terraform-destroy:
     name: Terraform Destroy
