@@ -123,6 +123,19 @@ jobs:
       - name: Deploy Jenkins
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} "
+              # Install Helm
+              curl -L https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz -o helm.tar.gz &&
+              tar -zxvf helm.tar.gz &&
+              sudo mv linux-amd64/helm /usr/local/bin/helm &&
+              rm -rf helm.tar.gz linux-amd64 &&
+              helm version &&
+
+              # Install kubectl
+              curl -LO \"https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl\" &&
+              sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl &&
+              rm kubectl &&
+              kubectl version --client &&
+
               # Add Jenkins Helm repository
               /usr/local/bin/helm repo add jenkins https://charts.jenkins.io &&
               /usr/local/bin/helm repo update &&
