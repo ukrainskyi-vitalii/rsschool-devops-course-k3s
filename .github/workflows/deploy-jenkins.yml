@@ -119,7 +119,19 @@ jobs:
         run: |
           echo "${{ env.SSH_PRIVATE_KEY }}" > private_key
           chmod 600 private_key
-  
+          
+      - name: Copy Jenkins Volume Configuration
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key helm-configs/jenkins-volume.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}:/home/${{ env.USER_NAME }}/jenkins-volume.yaml
+        
+      - name: Copy Jenkins Service Account Configuration
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key helm-configs/jenkins-sa.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}/jenkins-sa.yaml
+        
+      - name: Copy Jenkins Values Configuration
+        run: |
+          scp -o StrictHostKeyChecking=no -i private_key helm-configs/jenkins-values.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}/jenkins-values.yaml
+
       - name: Deploy Jenkins
         run: |
             ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} "
@@ -162,13 +174,13 @@ jobs:
                 ls -ld /data/jenkins-volume &&
      
                 # Apply persistent volume configuration
-                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f jenkins-volume.yaml &&
-     
+                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f /home/${{ env.USER_NAME }}/jenkins-volume.yaml &&
+
                 # Apply service account configuration
-                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f jenkins-sa.yaml &&
-     
-                # Install Jenkins using Helm with sudo for KUBECONFIG
-                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install jenkins -n jenkins -f jenkins-values.yaml jenkins/jenkins
+                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f /home/${{ env.USER_NAME }}/jenkins-sa.yaml &&
+
+                # Install Jenkins using Helm
+                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install jenkins -n jenkins -f /home/${{ env.USER_NAME }}/jenkins-values.yaml jenkins/jenkins
             "
 
       - name: Cleanup SSH Key
