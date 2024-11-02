@@ -129,7 +129,7 @@ jobs:
                 
               # Create Jenkins namespace
               kubectl create namespace jenkins || true
-          EOF
+          "
 
       - name: Cleanup SSH Key
         run: rm -f private_key
