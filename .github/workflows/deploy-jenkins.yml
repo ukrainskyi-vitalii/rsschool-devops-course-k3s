@@ -153,11 +153,17 @@ jobs:
                 sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl &&
                 rm kubectl &&
                 kubectl version --client &&
-     
+                  
+                # Remove any existing Jenkins repo
+                /usr/local/bin/helm repo remove jenkins || true
+
                 # Add Jenkins Helm repository
                 /usr/local/bin/helm repo add jenkins https://charts.jenkins.io &&
                 /usr/local/bin/helm repo update &&
                   
+                # Check that Jenkins repo is added
+                /usr/local/bin/helm search repo jenkins || exit 1 &&
+
                 # Wait for k3s to initialize fully
                 sleep 30 &&
      
@@ -174,13 +180,13 @@ jobs:
                 ls -ld /data/jenkins-volume &&
      
                 # Apply persistent volume configuration
-                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f /home/${{ env.USER_NAME }}/jenkins-volume.yaml &&
+                sudo /usr/local/bin/kubectl apply -f /home/${{ env.USER_NAME }}/jenkins-volume.yaml &&
 
                 # Apply service account configuration
-                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml kubectl apply -f /home/${{ env.USER_NAME }}/jenkins-sa.yaml &&
+                sudo /usr/local/bin/kubectl apply -f /home/${{ env.USER_NAME }}/jenkins-sa.yaml &&
 
                 # Install Jenkins using Helm
-                sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install jenkins -n jenkins -f /home/${{ env.USER_NAME }}/jenkins-values.yaml jenkins/jenkins
+                /usr/local/bin/helm install jenkins -n jenkins -f /home/${{ env.USER_NAME }}/jenkins-values.yaml jenkins/jenkins
             "
 
       - name: Cleanup SSH Key
