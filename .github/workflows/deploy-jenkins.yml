@@ -123,13 +123,13 @@ jobs:
       - name: Deploy Jenkins
         run: |
           ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} "
-              # Додайте Jenkins Helm репозиторій та оновіть його
+              # Add Jenkins Helm repository
               helm repo add jenkins https://charts.jenkins.io &&
               helm repo update &&
                 
-              # Створіть namespace для Jenkins
-              kubectl create namespace jenkins
-          "
+              # Create Jenkins namespace
+              kubectl create namespace jenkins || true
+          EOF
 
       - name: Cleanup SSH Key
         run: rm -f private_key
