@@ -141,6 +141,9 @@ jobs:
                 # Change permissions to allow access to k3s config
                 sudo chmod 644 /etc/rancher/k3s/k3s.yaml
      
+                # Set KUBECONFIG for both kubectl and helm
+                export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+
                 # Install Helm
                 curl -L https://get.helm.sh/helm-v3.16.2-linux-amd64.tar.gz -o helm.tar.gz &&
                 tar -zxvf helm.tar.gz &&
@@ -187,7 +190,7 @@ jobs:
                 sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml /usr/local/bin/kubectl apply -f /home/${{ env.USER_NAME }}/jenkins-sa.yaml &&
 
                 # Install Jenkins using Helm
-                /usr/local/bin/helm install jenkins -n jenkins -f /home/${{ env.USER_NAME }}/jenkins-values.yaml jenkins/jenkins
+                KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install jenkins -n jenkins -f /home/${{ env.USER_NAME }}/jenkins-values.yaml jenkins/jenkins
             "
 
       - name: Cleanup SSH Key
