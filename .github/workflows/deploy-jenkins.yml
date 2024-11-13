@@ -119,14 +119,14 @@ jobs:
       - name: Copy Jenkins Configurations
         run: bash ./.github/scripts/jenkins_configs.sh
         
-      - name: Install k3s, Helm, and kubectl
-        run: bash ./.github/scripts/install_tools.sh
-
-      - name: Initialize k3s and Jenkins Namespace
-        run: bash ./.github/scripts/initialize_k3s.sh
+      - name: Install k3s, Helm, and kubectl on remote server
+        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./.github/scripts/install_tools.sh
   
-      - name: Deploy Jenkins
-        run: bash ./.github/scripts/deploy_jenkins.sh
+      - name: Initialize k3s and Jenkins Namespace on remote server
+        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./.github/scripts/initialize_k3s.sh
+    
+      - name: Deploy Jenkins on remote server
+        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./.github/scripts/deploy_jenkins.sh
 
       - name: Cleanup SSH Key
         run: rm -f private_key
