@@ -114,19 +114,19 @@ jobs:
         uses: actions/checkout@v4
   
       - name: Setup SSH Key
-        run: bash ./scripts/setup_ssh.sh
+        run: bash ./.github/scripts/setup_ssh.sh
           
       - name: Copy Jenkins Configurations
-        run: bash ./scripts/jenkins_configs.sh
+        run: bash ./.github/scripts/jenkins_configs.sh
         
       - name: Install k3s, Helm, and kubectl
-        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./scripts/install_tools.sh
+        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./.github/scripts/install_tools.sh
 
       - name: Initialize k3s and Jenkins Namespace
-        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./scripts/initialize_k3s.sh
+        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./.github/scripts/initialize_k3s.sh
   
       - name: Deploy Jenkins
-        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./scripts/deploy_jenkins.sh
+        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./.github/scripts/deploy_jenkins.sh
 
       - name: Cleanup SSH Key
         run: rm -f private_key
