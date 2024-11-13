@@ -5,12 +5,12 @@ helm repo add jenkins https://charts.jenkins.io
 helm repo update
 
 # Wait for k3s to initialize fully
-until sudo kubectl get nodes; do
+until kubectl get nodes; do
   echo 'Waiting for k3s server to be ready...'
-  sleep 5
+  sleep 10
 done
 
 # Create Jenkins namespace and set context
-sudo kubectl create namespace jenkins || true
-sudo kubectl config set-context --current --namespace=jenkins
-sudo kubectl get namespaces
+kubectl create namespace jenkins || true
+kubectl config set-context --current --namespace=jenkins
+kubectl get namespaces
