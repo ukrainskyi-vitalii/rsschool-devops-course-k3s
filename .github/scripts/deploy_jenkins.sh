@@ -1,5 +1,9 @@
 #!/bin/bash
 # Create Jenkins volume directory
+
+echo "HOSTNAME: $HOSTNAME"
+echo "USER_NAME: $USER_NAME"
+
 sudo mkdir -p /data/jenkins-volume &&
 sudo chmod 777 /data/jenkins-volume &&
 ls -ld /data/jenkins-volume &&
