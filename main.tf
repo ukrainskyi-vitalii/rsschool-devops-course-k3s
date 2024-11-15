@@ -11,3 +11,7 @@ module "k3s" {
   ssh_key_name     = var.ssh_key_name
   public_subnet_id = module.vpc.public_subnet_1_id
 }
+
+module "ecr" {
+  source = "./modules/ecr"
+}
