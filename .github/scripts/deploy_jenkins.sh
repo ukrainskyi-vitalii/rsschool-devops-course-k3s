@@ -1,9 +1,5 @@
 #!/bin/bash
 # Create Jenkins volume directory
-
-echo "HOSTNAME: $HOSTNAME"
-echo "USER_NAME: $USER_NAME"
-
 sudo mkdir -p /data/jenkins-volume &&
 sudo chmod 777 /data/jenkins-volume &&
 ls -ld /data/jenkins-volume &&
@@ -14,4 +10,7 @@ sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml /usr/local/bin/kubectl apply -f jenkin
 
 # Install Jenkins using Helm
 KUBECONFIG=/etc/rancher/k3s/k3s.yaml helm install jenkins -n jenkins -f jenkins-values.yaml jenkins/jenkins
+
+# Verify Jenkins installation
+sudo KUBECONFIG=/etc/rancher/k3s/k3s.yaml /usr/local/bin/kubectl kubectl get svc
 
