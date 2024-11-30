@@ -22,6 +22,6 @@ helm install prometheus bitnami/prometheus \
   --create-namespace \
   --set-file serverFiles.prometheus.yml=/home/ubuntu/prometheus-config.yaml \
   --set server.service.type=NodePort \
-  --set server.service.nodePorts.http=32002
+  --set server.service.nodePorts.http="\"32002\""
 
 echo "Prometheus deployment completed!"
