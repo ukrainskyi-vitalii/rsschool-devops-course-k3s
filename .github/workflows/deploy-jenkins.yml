@@ -148,6 +148,15 @@ jobs:
       - name: Setup SSH Key
         run: bash ./.github/scripts/setup_ssh.sh
 
+      - name: Copy Prometheus Configuration
+        run: scp -i "rs-school.pem" ./.github/config/prometheus-config.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}:/home/ubuntu/prometheus-config.yaml
+      
+      - name: Install Prometheus using Helm on remote server
+        run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./.github/scripts/deploy_prometheus.sh
+
+      - name: Cleanup SSH Key
+        run: rm -f private_key
+
   terraform-destroy:
     name: Terraform Destroy
     runs-on: ubuntu-latest
