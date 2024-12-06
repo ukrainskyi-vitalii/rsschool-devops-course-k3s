@@ -1,4 +1,6 @@
 # DevOps Course. Terraform Infrastructure for AWS with GitHub Actions
+# Task 8: Grafana Installation and Dashboard Creation
+
 # Task 4: Jenkins Installation and Configuration
 
 ## Overview
