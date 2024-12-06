@@ -1,6 +1,90 @@
 # DevOps Course. Terraform Infrastructure for AWS with GitHub Actions
 # Task 8: Grafana Installation and Dashboard Creation
 
+# Task 7: Prometheus Deployment on K8s
+
+## Objective
+In this task, you will install Prometheus on your Kubernetes (K8s) cluster using a Helm chart and configure it to collect essential cluster-specific metrics.
+
+## Prerequisites
+- A Kubernetes cluster 
+- Helm installed on the cluster
+- Kubernetes CLI (kubectl) configured and connected to the cluster.
+- A valid kubeconfig file
+
+## Manual Deployment Steps
+
+1. Add the Bitnami Helm Chart Repository:
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+2. Deploy Prometheus: Run the following Helm command:
+```bash
+helm install prometheus bitnami/prometheus \
+   --namespace jenkins \
+   --set server.service.type=NodePort \
+   --set-string server.service.nodePorts.http=32002
+```
+3. Verify Installation: Check the pods and services:
+```bash
+kubectl get pods -n monitoring
+kubectl get svc -n monitoring
+```
+## Prometheus Configuration
+1. Edit configuration file:
+```bash
+kubectl edit configmap prometheus-server -n jenkins
+```
+2. Add new jobs:
+- kubernetes-pods: Collects metrics from individual
+Kubernetes pods with specific annotations.
+- kube-state-metrics: Provides metrics on the state of Kubernetes objects like pods, deployments, and services.
+- node-exporter: Monitors node-level resources such as CPU, memory, and disk usage.
+
+```bash
+scrape_configs:
+  - job_name: 'node-exporter'
+    scrape_interval: 1m
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - node-exporter.jenkins.svc.cluster.local:9100
+
+  - job_name: 'kube-state-metrics'
+    scrape_interval: 1m
+    metrics_path: /metrics
+    static_configs:
+      - targets:
+          - kube-state-metrics.jenkins.svc.cluster.local:8080
+
+  - job_name: kubernetes-pods
+    kubernetes_sd_configs:
+      - role: pod
+    relabel_configs:
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+        action: keep
+        regex: true
+      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+        action: replace
+        target_label: __metrics_path__
+        regex: (.+)
+      - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+        action: replace
+        target_label: __address__
+        regex: ([^:]+)(?::\d+)?;(\d+)
+        replacement: $1:$2
+```
+ 
+## Verifying Metrics Collection
+### 1 .Open the Prometheus UI at the provided URL.
+### 2. Go to Status > Targets to check active scrape targets.
+### 3. Verify metrics by querying:
+- node_memory_Active_bytes
+- sum(node_memory_MemTotal_bytes) - sum(node_memory_MemFree_bytes)
+
+>>>>>>> task-7
+
 # Task 4: Jenkins Installation and Configuration
 
 ## Overview
