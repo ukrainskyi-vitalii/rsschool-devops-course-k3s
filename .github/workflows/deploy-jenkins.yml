@@ -163,8 +163,9 @@ jobs:
     name: Deploy Grafana
     runs-on: ubuntu-latest
     needs: 
-      - deploy-jenkins
       - terraform-apply
+      - deploy-jenkins
+      - deploy-prometheus
       
     env:
       HOSTNAME: ${{ needs.terraform-apply.outputs.k3s_master_ip }}
