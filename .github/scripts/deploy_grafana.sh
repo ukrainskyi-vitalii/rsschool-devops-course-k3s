@@ -15,7 +15,7 @@ echo "kubeconfig setup completed!"
 echo "Creating a secret ..."
 
 kubectl create secret generic grafana-admin-password \
---from-literal=admin-password='qwerty1234' \
+--from-literal=password='qwerty1234' \
 -n jenkins
 
 echo "Deploying Grafana using Helm..."
