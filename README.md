@@ -1,4 +1,95 @@
 # DevOps Course. Terraform Infrastructure for AWS with GitHub Actions
+# Task 8: Grafana Installation and Dashboard Creation
+## Objective
+In this task, you will install Grafana on your Kubernetes (K8s) cluster using a Helm chart and create a dashboard to visualize Prometheus metrics.
+
+## Prerequisites
+- Kubernetes cluster up and running.
+- kubectl CLI installed and configured.
+- Helm installed and configured.
+- Prometheus installed and running in the cluster.
+
+# Manual Deployment Steps
+
+## Installation of Grafana
+
+### 1. Add Helm Repository
+
+Add the Bitnami Helm repository:
+
+```bash
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm repo update
+```
+
+### 2: Install Grafana
+
+Install Grafana in the namespace jenkins:
+
+```bash
+helm install grafana bitnami/grafana \
+--namespace jenkins \
+--set admin.password=your-admin-password \
+--set service.type=LoadBalancer
+```
+Replace your-admin-password with your desired admin password for Grafana.
+
+### 3: Verify Installation
+
+Check the status of the Grafana pod:
+
+```bash
+kubectl get pods -n jenkins
+```
+
+Get the external IP address of the Grafana service:
+
+```bash
+kubectl get svc -n monitoring
+```
+
+Access Grafana in your browser at http://<EXTERNAL-IP>
+
+## Configure Grafana
+
+### Add Prometheus Data Source
+
+- Log in to Grafana.
+- Navigate to Configuration → Data Sources → Add data source.
+- Select Prometheus and set the following:
+URL: http://<prometheus-server-service-name>.<namespace>:<port> (e.g., http://prometheus-server.monitoring:9090).
+- Click Save & Test to verify the connection.
+
+## Create a Dashboard
+
+### 1: Add Visualization
+
+1. Navigate to Dashboards → New Dashboard → Add a new panel.
+2. Select Prometheus as the data source.
+3. Enter the PromQL query for the desired metric. For example:
+
+CPU Utilization:
+```bash
+rate(node_cpu_seconds_total{mode!="idle"}[5m])
+```
+
+Memory Usage:
+```bash
+node_memory_Active_bytes / node_memory_MemTotal_bytes
+```
+
+Disk Space Usage:
+```bash
+1 - (node_filesystem_avail_bytes / node_filesystem_size_bytes)
+```
+
+4. Customize the panel's visualization and title.
+5. Click Apply to save the panel.
+
+## 2: Save Dashboard
+1. After adding all necessary panels, click Save Dashboard.
+2. Enter a name for the dashboard and save it.
+
 
 # Task 7: Prometheus Deployment on K8s
 
@@ -82,6 +173,7 @@ scrape_configs:
 - node_memory_Active_bytes
 - sum(node_memory_MemTotal_bytes) - sum(node_memory_MemFree_bytes)
 
+>>>>>>> task-7
 
 # Task 4: Jenkins Installation and Configuration
 
