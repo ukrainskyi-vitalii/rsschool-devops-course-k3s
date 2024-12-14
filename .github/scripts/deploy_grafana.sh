@@ -13,7 +13,9 @@ echo "kubeconfig setup completed!"
 
 echo "Applying ConfigMap for Alert Rules and Contact Points..."
 
-CONFIGMAP_PATH="$(cd "$(dirname "$0")/../config" && pwd)/grafana-alerts-configmap.yaml"
+CONFIGMAP_PATH="$(dirname "$0")/../config/grafana-alerts-configmap.yaml"
+echo "Resolved CONFIGMAP_PATH: $CONFIGMAP_PATH"
+
 if [ -f "$CONFIGMAP_PATH" ]; then
   kubectl apply -f "$CONFIGMAP_PATH"
   echo "ConfigMap for Alert Rules and Contact Points applied."
