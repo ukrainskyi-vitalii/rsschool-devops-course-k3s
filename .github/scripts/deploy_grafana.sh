@@ -13,7 +13,7 @@ echo "kubeconfig setup completed!"
 
 echo "Applying ConfigMap for Alert Rules and Contact Points..."
 
-kubectl create configmap grafana-alerts -n monitoring --from-file=grafana-alerts-configmap.yaml
+kubectl create configmap grafana-alerts -n jenkins --from-file=grafana-alerts-configmap.yaml
 
 if [ $? -ne 0 ]; then
   echo "Failed to apply ConfigMap for Alert Rules and Contact Points."
