@@ -1,0 +1,28 @@
+service:
+  type: LoadBalancer
+  port: 30125
+
+datasources:
+  secretDefinition:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.jenkins.svc.cluster.local:80
+      isDefault: true
+
+admin:
+  existingSecret: grafana-admin-password
+  existingSecretPasswordKey: password
+
+smtp:
+  enabled: true
+  host: email-smtp.eu-west-1.amazonaws.com:587
+  fromName: "Grafana Alerts"
+  fromAddress: ukrainskyi.vitalii@gmail.com
+  existingSecret: grafana-smtp-ses
+  existingSecretUserKey: user
+  existingSecretPasswordKey: password
+
+alerting:
+  configMapName: grafana-alerts

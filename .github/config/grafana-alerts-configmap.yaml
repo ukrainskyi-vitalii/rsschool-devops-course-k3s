@@ -1,0 +1,130 @@
+apiVersion: 1
+contactPoints:
+  - name: EmailAlerts
+    receivers:
+      - uid: "email_uid"
+        type: email
+        settings:
+          addresses: ukrainskyi.vitalii@gmail.com
+          singleEmail: false
+        disableResolveMessage: false
+
+groups:
+  - orgId: 1
+    name: group_1m
+    folder: TestFolder
+    interval: 1m
+    rules:
+      - uid: high_cpu_usage_uid
+        title: High CPU Usage Alert
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              datasource:
+                  type: prometheus
+                  uid: prometheus_uid
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+              expr: sum(rate(node_cpu_seconds_total{mode!="idle"}[5m])) by (instance) / sum(rate(node_cpu_seconds_total[5m])) by (instance) * 100
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                  type: __expr__
+                  uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+              type: reduce
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                  type: __expr__
+                  uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+              evaluator:
+                params: [80]
+                type: gt
+        dashboardUid: random-walk
+        panelId: 1
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          __dashboardUid__: random-walk
+          __panelId__: "1"
+        labels:
+          monitor: cpu_alert
+        isPaused: false
+        notification_settings:
+          receiver: EmailAlerts
+
+      - uid: high_memory_usage_uid
+        title: High Memory Usage Alert
+        condition: C
+        data:
+          - refId: A
+            relativeTimeRange:
+              from: 300
+              to: 0
+            datasourceUid: PBFA97CFB590B2093
+            model:
+              datasource:
+                  type: prometheus
+                  uid: prometheus_uid
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: A
+              expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+          - refId: B
+            datasourceUid: __expr__
+            model:
+              datasource:
+                  type: __expr__
+                  uid: __expr__
+              expression: A
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: B
+              type: reduce
+              reducer: last
+          - refId: C
+            datasourceUid: __expr__
+            model:
+              datasource:
+                  type: __expr__
+                  uid: __expr__
+              expression: B
+              intervalMs: 1000
+              maxDataPoints: 43200
+              refId: C
+              type: threshold
+              evaluator:
+                params: [80]
+                type: gt
+        dashboardUid: random-walk
+        panelId: 2
+        noDataState: NoData
+        execErrState: Error
+        for: 1m
+        annotations:
+          __dashboardUid__: random-walk
+          __panelId__: "2"
+        labels:
+          monitor: memory_alert
+        isPaused: false
+        notification_settings:
+          receiver: EmailAlerts
