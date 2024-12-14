@@ -43,9 +43,7 @@ groups:
               maxDataPoints: 43200
               refId: B
               type: reduce
-              reducer:
-                params: []
-                type: last
+              reducer: last
           - refId: C
             datasourceUid: __expr__
             model:
@@ -99,9 +97,7 @@ groups:
               maxDataPoints: 43200
               refId: B
               type: reduce
-              reducer:
-                params: []
-                type: last
+              reducer: last
           - refId: C
             datasourceUid: __expr__
             model:
