@@ -10,7 +10,8 @@ groups:
     interval: 5m
     folder: Alerts
     rules:
-      - title: High CPU Usage Alert
+      - uid: high-cpu-usage
+        title: High CPU Usage Alert
         condition: C
         data:
           - refId: A
@@ -28,7 +29,8 @@ groups:
         notification_settings:
           receiver: EmailAlerts
 
-      - title: High Memory Usage Alert
+      - uid: high-memory-usage
+        title: High Memory Usage Alert
         condition: C
         data:
           - refId: A
