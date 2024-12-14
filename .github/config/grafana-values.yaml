@@ -19,7 +19,7 @@ smtp:
   enabled: true
   host: email-smtp.eu-west-1.amazonaws.com:587
   fromName: "Grafana Alerts"
-  fromAddress: alerts@example.com
+  fromAddress: ukrainskyi.vitalii@gmail.com
   existingSecret: grafana-smtp-ses
   existingSecretUserKey: user
   existingSecretPasswordKey: password

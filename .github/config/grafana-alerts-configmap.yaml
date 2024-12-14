@@ -1,178 +1,46 @@
 apiVersion: 1
 contactPoints:
-  - orgId: 1
-    name: Admin
+  - name: EmailAlerts
     receivers:
-      - uid: "u-n-i-q-u-e-i-d"
-        type: email
+      - type: email
         settings:
-          addresses: alerts@example.com
-          singleEmail: false
-        disableResolveMessage: false
-
+          addresses: ukrainskyi.vitalii@gmail.com
 groups:
-  - orgId: 1
-    name: eval-group
-    folder: alerts
-    interval: 30s
+  - name: ResourceAlerts
+    interval: 5m
     rules:
-      - uid: de6t4y75i3e2od
-        title: High CPU User Time
+      - title: High CPU Usage Alert
         condition: C
         data:
           - refId: A
-            relativeTimeRange:
-              from: 600
-              to: 0
-            datasourceUid: PBFA97CFB590B2093
             model:
-              editorMode: code
-              expr: avg(rate(node_cpu_seconds_total{mode="user"}[1m])) by (instance)
-              instant: true
-              intervalMs: 1000
-              legendFormat: __auto
-              maxDataPoints: 43200
-              range: false
-              refId: A
+              expr: sum(rate(node_cpu_seconds_total{mode!="idle"}[5m])) by (instance) / sum(rate(node_cpu_seconds_total[5m])) by (instance) * 100
+              interval: 5m
           - refId: B
-            datasourceUid: __expr__
             model:
-              conditions:
-                  - evaluator:
-                      params: []
-                      type: gt
-                    operator:
-                      type: and
-                    query:
-                      params:
-                          - B
-                    reducer:
-                      params: []
-                      type: last
-                    type: query
-              datasource:
-                  type: __expr__
-                  uid: __expr__
-              expression: A
-              intervalMs: 1000
-              maxDataPoints: 43200
-              reducer: last
-              refId: B
-              type: reduce
-          - refId: C
-            datasourceUid: __expr__
-            model:
-              conditions:
-                  - evaluator:
-                      params:
-                          - 0.8
-                      type: gt
-                    operator:
-                      type: and
-                    query:
-                      params:
-                          - C
-                    reducer:
-                      params: []
-                      type: last
-                    type: query
-              datasource:
-                  type: __expr__
-                  uid: __expr__
-              expression: A
-              intervalMs: 1000
-              maxDataPoints: 43200
-              refId: C
-              type: threshold
-        dashboardUid: ce63g4nv7591cb
-        panelId: 1
-        noDataState: NoData
-        execErrState: Error
+              expr: A > 80
+        annotations:
+          summary: "CPU usage exceeded 80% on {{ $labels.instance }}"
         for: 1m
-        annotations:
-          __dashboardUid__: ce63g4nv7591cb
-          __panelId__: "1"
-          summary: High CPU Load Detected! Please look into your k8s Cluster!
-        isPaused: false
+        noDataState: NoData
+        execErrState: Error
         notification_settings:
-          receiver: Admin
-      - uid: be6t63vq66olcb
-        title: High RAM Usage
+          receiver: EmailAlerts
+
+      - title: High Memory Usage Alert
         condition: C
         data:
           - refId: A
-            relativeTimeRange:
-              from: 600
-              to: 0
-            datasourceUid: PBFA97CFB590B2093
             model:
-              editorMode: code
-              expr: 1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes
-              instant: true
-              intervalMs: 1000
-              legendFormat: __auto
-              maxDataPoints: 43200
-              range: false
-              refId: A
+              expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+              interval: 5m
           - refId: B
-            datasourceUid: __expr__
             model:
-              conditions:
-                  - evaluator:
-                      params: []
-                      type: gt
-                    operator:
-                      type: and
-                    query:
-                      params:
-                          - B
-                    reducer:
-                      params: []
-                      type: last
-                    type: query
-              datasource:
-                  type: __expr__
-                  uid: __expr__
-              expression: A
-              intervalMs: 1000
-              maxDataPoints: 43200
-              reducer: last
-              refId: B
-              type: reduce
-          - refId: C
-            datasourceUid: __expr__
-            model:
-              conditions:
-                  - evaluator:
-                      params:
-                          - 0.7
-                      type: gt
-                    operator:
-                      type: and
-                    query:
-                      params:
-                          - C
-                    reducer:
-                      params: []
-                      type: last
-                    type: query
-              datasource:
-                  type: __expr__
-                  uid: __expr__
-              expression: B
-              intervalMs: 1000
-              maxDataPoints: 43200
-              refId: C
-              type: threshold
-        dashboardUid: ce63g4nv7591cb
-        panelId: 2
+              expr: A > 80
+        annotations:
+          summary: "Memory usage exceeded 80% on {{ $labels.instance }}"
+        for: 1m
         noDataState: NoData
         execErrState: Error
-        for: 30s
-        annotations:
-          __dashboardUid__: ce63g4nv7591cb
-          __panelId__: "2"
-          summary: High RAM Load Alert Indicates that at least one of the cluster nodes experiences high RAM Usage
-        isPaused: false
         notification_settings:
-          receiver: Admin
+          receiver: EmailAlerts
