@@ -25,18 +25,13 @@ smtp:
   existingSecretPasswordKey: password
 
 alerting:
-  configMapName: grafana-alerts
-  rules:
-    - alert: HighCPUUsage
-      expr: rate(node_cpu_seconds_total{mode!="idle"}[1m]) > 0.6
-      for: 2m
-      labels:
-        severity: warning
-      annotations:
-        summary: "High CPU usage detected"
+  enabled: true
 
-contactPoints:
-  - name: email-alert
-    type: email
-    receivers:
-      - email: alerts@example.com
+extraVolumes:
+  - name: grafana-alerts
+    configMap:
+      name: grafana-alerts
+
+extraVolumeMounts:
+  - name: grafana-alerts
+    mountPath: /etc/grafana/provisioning/alerting

@@ -54,3 +54,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo "Grafana deployed successfully with ConfigMap mounted for Alert Rules and Contact Points!"
+
+echo "Verifying deployments..."
+kubectl get pods -n jenkins
+kubectl get svc -n jenkins
