@@ -23,7 +23,7 @@ groups:
             relativeTimeRange:
               from: 300
               to: 0
-            datasourceUid: testdata_uid
+            datasourceUid: PBFA97CFB590B2093
             model:
               datasource:
                   type: prometheus
@@ -76,7 +76,7 @@ groups:
             relativeTimeRange:
               from: 300
               to: 0
-            datasourceUid: testdata_uid
+            datasourceUid: PBFA97CFB590B2093
             model:
               datasource:
                   type: prometheus
