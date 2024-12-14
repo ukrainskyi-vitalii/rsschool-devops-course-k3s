@@ -1,4 +1,112 @@
 # DevOps Course. Terraform Infrastructure for AWS with GitHub Actions
+
+# Task 9: Alertmanager Configuration and Verification
+
+## Alertmanager Setup and Alert Configuration
+
+## Objective
+This document describes the steps to set up alerting in Grafana using Prometheus as the data source. Alerts are configured to monitor CPU utilization and RAM capacity in a Kubernetes cluster, with notifications sent via email using AWS SES.
+
+## Prerequisites
+1. Kubernetes cluster with Prometheus and Grafana installed.
+2. Node Exporter and Kube State Metrics installed for monitoring metrics.
+3. AWS SES verified email address for sending alerts.
+
+## Step 1: Configure Grafana SMTP
+- Create a secret for the Grafana admin password:
+
+```bash
+kubectl create secret generic grafana-admin-password \
+--from-literal=admin-password=GrafanaAdminPassword \
+-n jenkins
+```
+- Install Grafana using Helm:
+```bash
+helm upgrade --install grafana oci://registry-1.docker.io/bitnamicharts/grafana \
+    --namespace jenkins \
+    --set persistence.enabled=true \
+    --set persistence.size=2Gi \
+    --set admin.existingSecret=grafana-admin-password \
+    --set service.type=LoadBalancer \
+    --set service.port=30125 \
+    --set smtp.enabled=true \
+    --set smtp.host=email-smtp.eu-west-1.amazonaws.com:587 \
+    --set smtp.user=<AWS_SES_SMTP_USER> \
+    --set smtp.password=<AWS_SES_SMTP_PASSWORD> \
+    --set smtp.fromAddress=<YOUR_VERIFIED_EMAIL> \
+    --set smtp.fromName="Grafana Alerts"
+```
+- Retrieve the LoadBalancer IP
+```bash
+kubectl get svc -n jenkins
+```
+
+Open Grafana in your browser at http://#LoadBalancer-IP#:30125
+
+- Test SMTP settings. Navigate to Alerting → Contact points → Test notification in Grafana.
+
+## Step 2: Create a CPU Utilization Alert
+
+1. Create a new alert:
+- Navigate to Alerting → Alert rules → New alert rule.
+- Use the following PromQL query:
+promql
+
+```bash
+sum(rate(node_cpu_seconds_total{mode!="idle"}[5m])) by (instance) / sum(rate(node_cpu_seconds_total[5m])) by (instance) * 100
+```
+
+2. Set threshold conditions:
+- Trigger an alert when CPU usage exceeds 80%:
+```bash
+WHEN avg() OF query IS ABOVE 80
+```
+3. Set evaluation parameters:
+- Evaluate every: 1m.
+- For: 3m.
+
+4. Save the alert:
+- Name the alert: High CPU Usage Alert.
+
+## Step 3: Create a Memory Utilization Alert
+
+1. Create a new alert:
+- Navigate to Alerting → Alert rules → New alert rule.
+- Use the following PromQL query:
+promql
+
+```bash
+(1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100
+```
+
+2. Set threshold conditions:
+- Trigger an alert when memory usage exceeds 80%:
+```bash
+WHEN avg() OF query IS ABOVE 80
+```
+3. Set evaluation parameters:
+- Evaluate every: 1m.
+- For: 3m.
+
+4. Save the alert:
+- Name the alert: High Memory Usage Alert.
+
+## Step 4: Test Alerts
+1. Test CPU Alert:
+- Run the following stress test to simulate high CPU usage:
+```bash
+stress --cpu 4 --timeout 300
+```
+2. Test Memory Alert:
+- Run the following stress test to simulate high memory usage:
+```bash
+stress --vm 1 --vm-bytes 90% --timeout 300
+```
+3. Verify Alerts:
+- Navigate to Alerting → Active alerts in Grafana and ensure the alerts transition to Firing.
+- Check your email inbox for alert notifications.
+
+
 # Task 8: Grafana Installation and Dashboard Creation
 ## Objective
 In this task, you will install Grafana on your Kubernetes (K8s) cluster using a Helm chart and create a dashboard to visualize Prometheus metrics.
