@@ -55,6 +55,9 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
+              evaluator:
+                params: [80]
+                type: gt
         dashboardUid: random-walk
         panelId: 1
         noDataState: NoData
@@ -109,6 +112,9 @@ groups:
               maxDataPoints: 43200
               refId: C
               type: threshold
+              evaluator:
+                params: [80]
+                type: gt
         dashboardUid: random-walk
         panelId: 2
         noDataState: NoData
