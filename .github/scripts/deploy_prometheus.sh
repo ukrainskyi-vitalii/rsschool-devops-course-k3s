@@ -38,8 +38,4 @@ helm install node-exporter prometheus-community/prometheus-node-exporter \
 
 echo "node-exporter deployment completed!"
 
-echo "Verifying deployments..."
-kubectl get pods -n jenkins
-kubectl get svc -n jenkins
-
 echo "All components are successfully deployed!"
