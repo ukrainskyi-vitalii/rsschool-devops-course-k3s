@@ -180,7 +180,7 @@ jobs:
         run: bash ./.github/scripts/setup_ssh.sh
       
       - name: Copy Grafana Alert Configuration
-        run: scp -o StrictHostKeyChecking=no -i private_key ./.github/config/grafana-alerts-configmap.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}:/home/ubuntu/grafana-alerts-configmap.yaml
+        run: scp -o StrictHostKeyChecking=no -i private_key ./.github/config/grafana_values.yaml ${{ env.USER_NAME }}@${{ env.HOSTNAME }}:/home/ubuntu/grafana_values.yaml
 
       - name: Install Grafana using Helm on remote server
         run: ssh -o StrictHostKeyChecking=no -i private_key ${{ env.USER_NAME }}@${{ env.HOSTNAME }} 'bash -s' < ./.github/scripts/deploy_grafana.sh

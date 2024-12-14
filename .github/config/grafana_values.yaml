@@ -1,0 +1,50 @@
+service:
+  type: LoadBalancer
+  port: 30125
+
+datasources:
+  secretDefinition:
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      url: http://prometheus-server.jenkins.svc.cluster.local:80
+      isDefault: true
+
+admin:
+  existingSecret: grafana-admin-password
+  existingSecretPasswordKey: password
+
+smtp:
+  enabled: true
+  host: email-smtp.eu-west-1.amazonaws.com:587
+  fromName: "Grafana Alerts"
+  fromAddress: alerts@example.com
+  existingSecret: grafana-smtp-ses
+  existingSecretUserKey: user
+  existingSecretPasswordKey: password
+
+alerting:
+  alertmanager_config:
+    alertmanagers:
+      - static_configs:
+          - targets:
+              - "http://alertmanager-service.jenkins.svc.cluster.local"
+
+alerting_config:
+  groups:
+    - name: CPUAlerts
+      rules:
+        - alert: HighCPUUsage
+          expr: rate(node_cpu_seconds_total{mode!="idle"}[1m]) > 0.6
+          for: 2m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High CPU usage detected"
+
+contact_points:
+  email-alert:
+    type: email
+    receivers:
+      - email: alerts@example.com
