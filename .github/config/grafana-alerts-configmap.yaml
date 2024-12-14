@@ -8,6 +8,7 @@ contactPoints:
 groups:
   - name: ResourceAlerts
     interval: 5m
+    folder: Alerts
     rules:
       - title: High CPU Usage Alert
         condition: C
