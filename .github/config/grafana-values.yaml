@@ -25,26 +25,18 @@ smtp:
   existingSecretPasswordKey: password
 
 alerting:
-  alertmanager_config:
-    alertmanagers:
-      - static_configs:
-          - targets:
-              - "http://alertmanager-service.jenkins.svc.cluster.local"
+  configMapName: grafana-alerts
+  rules:
+    - alert: HighCPUUsage
+      expr: rate(node_cpu_seconds_total{mode!="idle"}[1m]) > 0.6
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU usage detected"
 
-alerting_config:
-  groups:
-    - name: CPUAlerts
-      rules:
-        - alert: HighCPUUsage
-          expr: rate(node_cpu_seconds_total{mode!="idle"}[1m]) > 0.6
-          for: 2m
-          labels:
-            severity: warning
-          annotations:
-            summary: "High CPU usage detected"
-
-contact_points:
-  email-alert:
+contactPoints:
+  - name: email-alert
     type: email
     receivers:
       - email: alerts@example.com

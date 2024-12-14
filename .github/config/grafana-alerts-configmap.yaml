@@ -4,6 +4,16 @@ metadata:
   name: grafana-alerts
   namespace: jenkins
 data:
+  contact-point.json: |
+    {
+      "name": "email-alert",
+      "type": "email",
+      "settings": {
+        "addresses": "alerts@example.com",
+        "subject": "Grafana Alert",
+        "textBody": "Alert: {{ .Labels.alertname }} triggered on {{ .Labels.instance }}."
+      }
+    }
   cpu-alert.json: |
     {
       "dashboardUid": "cpu-alert-dashboard",
@@ -30,14 +40,4 @@ data:
           "uid": "email-alert"
         }
       ]
-    }
-  contact-point.json: |
-    {
-      "name": "email-alert",
-      "type": "email",
-      "settings": {
-        "addresses": "alerts@example.com",
-        "subject": "Grafana Alert",
-        "textBody": "Alert: {{ .Labels.alertname }} triggered on {{ .Labels.instance }}."
-      }
     }

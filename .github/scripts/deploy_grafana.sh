@@ -35,7 +35,7 @@ helm repo update
 
 helm upgrade --install grafana bitnami/grafana \
     --namespace jenkins \
-    -f grafana_values.yaml
+    -f grafana-values.yaml
 
 if [ $? -ne 0 ]; then
   echo "Failed to deploy Grafana using Helm."
