@@ -11,6 +11,17 @@ sudo chown $(id -u):$(id -g) ~/.kube/config
 
 echo "kubeconfig setup completed!"
 
+echo "Applying ConfigMap for Alert Rules and Contact Points..."
+
+kubectl apply -f grafana-alerts-configmap.yaml
+
+if [ $? -ne 0 ]; then
+  echo "Failed to apply ConfigMap for Alert Rules and Contact Points."
+  exit 1
+fi
+
+echo "ConfigMap for Alert Rules and Contact Points applied."
+
 echo "Creating a secret ..."
 
 kubectl create secret generic grafana-admin-password \
